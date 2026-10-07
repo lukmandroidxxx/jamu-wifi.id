@@ -141,3 +141,8 @@ sudo systemctl restart ip-filter.service
 echo "=================================================="
 echo "  PROSES INSTALASI SELESAI & SISTEM SUDAH AKTIF!  "
 echo "=================================================="
+# 1. Atur batas maksimal penyimpanan log systemd menjadi 10 Megabyte
+sudo sed -i 's/#SystemMaxUse=/SystemMaxUse=10M/g' /etc/systemd/journald.conf
+
+# 2. Restart layanan log agar pengaturan baru langsung aktif
+sudo systemctl restart systemd-journald
