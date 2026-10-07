@@ -1,0 +1,34 @@
+#!/bin/bash
+
+echo "=================================================="
+echo "    MEMULAI PROSES UNINSTALL #JAMU WIFI ID        "
+echo "=================================================="
+
+# 1. Hentikan dan hapus Systemd Service
+echo "[1/4] Menghentikan dan menghapus layanan otomatis..."
+sudo systemctl stop ip-filter.service 2>/dev/null
+sudo systemctl disable ip-filter.service 2>/dev/null
+sudo rm -f /etc/systemd/system/ip-filter.service
+sudo systemctl daemon-reload
+
+# 2. Hapus Script Utama
+echo "[2/4] Menghapus file skrip utama..."
+sudo rm -f /usr/local/bin/ip_check.sh
+
+# 3. Hapus Database IP (Whitelist & Blacklist)
+echo "[3/4] Menghapus basis data IP lokal..."
+sudo rm -f /etc/ip_whitelist.txt
+sudo rm -f /etc/ip_blacklist.txt
+
+# 4. Hapus Aturan Cron Job Auto-Clear
+echo "[4/4] Membersihkan jadwal pembersihan berkala dari Cron..."
+crontab -l 2>/dev/null | grep -v "ip_whitelist.txt" | crontab -
+
+# 5. Kembalikan pengaturan Log Journald ke default (Opsional)
+echo "Mengembalikan pengaturan batas log sistem ke awal..."
+sudo sed -i 's/SystemMaxUse=10M/#SystemMaxUse=/g' /etc/systemd/journald.conf
+sudo systemctl restart systemd-journald 2>/dev/null
+
+echo "=================================================="
+echo "   PEMBERSIHAN TOTAL SELESAI! SISTEM BERSIH.     "
+echo "=================================================="
